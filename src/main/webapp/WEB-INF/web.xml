@@ -7,12 +7,33 @@
   <display-name>Simple Servlet Application</display-name>
   <servlet>
     <servlet-name>simpleServlet</servlet-name>
-    <servlet-class>org.yashchex.SimpleServlet</servlet-class>
+    <servlet-class>org.yashchex.servlets.SimpleServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>servicePubKey</servlet-name>
+    <servlet-class>org.yashchex.servlets.ServicePubKey</servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>stateService</servlet-name>
+    <servlet-class>org.yashchex.servlets.StateService</servlet-class>
   </servlet>
 
   <servlet-mapping>
     <servlet-name>simpleServlet</servlet-name>
     <url-pattern>/hello</url-pattern>
   </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>servicePubKey</servlet-name>
+    <url-pattern>/pubKey</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>stateService</servlet-name>
+    <url-pattern>/state</url-pattern>
+  </servlet-mapping>
+
 </web-app>

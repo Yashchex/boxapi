@@ -1,4 +1,4 @@
-package org.yashchex;
+package org.yashchex.servlets;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
