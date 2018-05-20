@@ -7,11 +7,9 @@ import org.web3j.protocol.http.HttpService;
 import yashchex.api.ContractAPI;
 import yashchex.api.Yashchex;
 
-import java.io.File;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.yashchex.Status.*;
 
 public class YashchikCore {
 
@@ -20,8 +18,8 @@ public class YashchikCore {
     public final int NETWORK_ID_ROPSTEN = 3;
     private String infuraAccessToken = "YourInfuraAccessToken";
     private String infuraTestNetRopstenUrl = "https://ropsten.infura.io/" + infuraAccessToken;
-    private String credentialPath = "C://projects/quickstart/helloworld-rs/.eth";
-    private String password = java.util.UUID.randomUUID().toString();
+    private String credentialPath = "C://projects/boxapi/.eth";
+    private String password;
     private Web3j web3j;
     private String walletFile;
     private Credentials credentials;
@@ -34,8 +32,10 @@ public class YashchikCore {
 
     public YashchikCore() {
         try {
+            password = "zAq1xsw2";//java.util.UUID.randomUUID().toString();
+
             web3j = Web3j.build(new HttpService(infuraTestNetRopstenUrl));
-            walletFile = WalletUtils.generateLightNewWalletFile(password, new File(credentialPath));
+            walletFile = "UTC--2018-05-20T12-54-34_638627200Z--829fcd3d2f72a3f9bc95f48392cf2155b7daedcb.json";//WalletUtils.generateLightNewWalletFile(password, new File(credentialPath));
             credentials = WalletUtils.loadCredentials(password, credentialPath + "/" + walletFile);
             publicAddress = credentials.getAddress();
 
@@ -47,6 +47,7 @@ public class YashchikCore {
 
             arduinoPort = new ArduinoPort();
             arduinoPort.initialize();
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -57,12 +58,7 @@ public class YashchikCore {
         return YASCCHIK;
     }
 
-    public static void main(String[] args) throws Exception {
-        YashchikCore yashchikCore = new YashchikCore();
-        yashchikCore.run();
-    }
-
-    private void run() {
+    public void run() {
         final long[] latestTimeStamp = {System.currentTimeMillis()};
         long latestContractTimeStamp = System.currentTimeMillis();
         boolean canBeOpen = false;
@@ -79,22 +75,38 @@ public class YashchikCore {
                 }
             }
 
-            arduinoPort.getLastUnviewStates().stream().forEach(
-                    s -> {
-                        if (Stream.of(GERCON_OPEN, WALL_DAMAGED, SAFE_DAMAGED).collect(Collectors.toList()).contains(s.status)) {
-                            contract.state(false, false, "55.711601, 37.581640", "Коробка повреждена!!!");
-                        } else if (GOOD_WAITING.equals(s) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
-                            latestTimeStamp[0] = System.currentTimeMillis();
-                            contract.state(true, false, "55.711601, 37.581640", null);
-                        } else if (OPENED.equals(s) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
-                            latestTimeStamp[0] = System.currentTimeMillis();
-                            contract.state(true, true, "55.711601, 37.581640", null);
-                        } else if (UNLOCKED.equals(s) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
-                            latestTimeStamp[0] = System.currentTimeMillis();
-                            contract.state(true, false, "55.711601, 37.581640", null);
-                        }
-                    });
+            State s = arduinoPort.getLastState();
+
+            if (s != null) {
+
+                try {
+                    if (Stream.of("GERCON_OPEN", "WALL_DAMAGED", "SAFE_DAMAGED").collect(Collectors.toList()).contains(s.getStatus())) {
+                        contract.state(false, false, "55.711601, 37.581640", "Коробка повреждена!!!").send();
+                    } else if ("GOOD_WAITING".equals(s.getStatus()) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
+                        latestTimeStamp[0] = System.currentTimeMillis();
+                        contract.state(true, false, "55.711601, 37.581640", "").send();
+                    } else if ("OPENED".equals(s.getStatus()) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
+                        latestTimeStamp[0] = System.currentTimeMillis();
+                        contract.state(true, true, "55.711601, 37.581640", "").send();
+                    } else if ("UNLOCKED".equals(s.getStatus()) && System.currentTimeMillis() - latestTimeStamp[0] > 30000) {
+                        latestTimeStamp[0] = System.currentTimeMillis();
+                        contract.state(true, false, "55.711601, 37.581640", "").send();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Thread.currentThread().sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public List<State> latestStates() {
+        return arduinoPort.getLastUnviewStates();
     }
 
     public State getState() {
@@ -111,5 +123,7 @@ public class YashchikCore {
         return credentialPath;
     }
 
-
+    public String getWalletFile() {
+        return walletFile;
+    }
 }

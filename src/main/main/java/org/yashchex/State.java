@@ -3,11 +3,11 @@ package org.yashchex;
 import java.util.Date;
 
 public class State {
-    Status status;
+    String status;
     Date date;
 
     public State(String status, Date date) {
-        this.status = Status.valueOf(status);
+        this.status = status;
         this.date = date;
     }
 
@@ -19,15 +19,12 @@ public class State {
                 '}';
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     public void setStatus(String status) {
-        this.status = Status.valueOf(status);
+        this.status = status;
     }
 }

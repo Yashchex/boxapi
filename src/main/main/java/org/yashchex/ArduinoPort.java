@@ -41,7 +41,7 @@ public class ArduinoPort implements SerialPortEventListener {
     private int secondCommaPosition; // текущая позиция следующей запятой
     private volatile String data = new String(); // данные на входе COM - порта
     //private static Sender blockChainSender = new Sender("192.168.1.227", 50051);
-    private List<State> stateHistory = new ArrayList<State>();
+    private volatile List<State> stateHistory = new ArrayList<State>();
     private volatile int getCounter = 0;
 
     public void initialize() {
@@ -170,7 +170,7 @@ public class ArduinoPort implements SerialPortEventListener {
 
     public State getLastState() {
         getCounter = this.stateHistory.size();
-        return this.stateHistory.get(this.stateHistory.size());
+        return getCounter > 0 ? this.stateHistory.get(this.stateHistory.size() - 1) : null;
     }
 
     public void unlock() {

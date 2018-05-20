@@ -21,6 +21,11 @@
     <servlet-class>org.yashchex.servlets.StateService</servlet-class>
   </servlet>
 
+  <servlet>
+    <servlet-name>lastStatesService</servlet-name>
+    <servlet-class>org.yashchex.servlets.StateService</servlet-class>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>simpleServlet</servlet-name>
     <url-pattern>/hello</url-pattern>
@@ -34,6 +39,11 @@
   <servlet-mapping>
     <servlet-name>stateService</servlet-name>
     <url-pattern>/state</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>lastStatesService</servlet-name>
+    <url-pattern>/lastStates</url-pattern>
   </servlet-mapping>
 
 </web-app>
